@@ -2,7 +2,7 @@
 
 > A Vue.js project
 
-## Build Setup
+## 如何启动前端
 
 ``` bash
 # install dependencies
@@ -19,3 +19,14 @@ npm run build --report
 ```
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+
+## 如何启动后端
+
+> A nodejs、express project
+
+进入server文件夹运行
+
+```bash
+node app
+```
+
