@@ -32,7 +32,7 @@ query('select * from users',(qerr,vals,fields)=>{
 	// console.log(fields);
 	if(qerr==null){
 		tableData=vals
-		console.log(vals)
+		console.log(vals[0].status)
 	}
 });
 // client.search({

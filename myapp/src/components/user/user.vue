@@ -110,11 +110,15 @@ export default{
         , params).then(result=>{
              console.log(result.data)
              this.msg = result.data.msg
-             if(this.msg.length==0){
+             if(result.data.status==0){
+               this.$message({
+                 type: 'warning',
+                 message: this.msg
+               })
                return
              }
              else{
-               sessionStorage.setItem("token", 'true');
+               sessionStorage.setItem("token", 'true');//设置session会话信息！！！
                this.$router.push('/search_home');
              }
       }).catch(resp =>{

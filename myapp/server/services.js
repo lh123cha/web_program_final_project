@@ -18,9 +18,11 @@ exports.login = (req,res)=>{
   // 查询语句
   let sql = 'select * from users where username = ?';
   let opsql='insert into ophistorys(username,email,operation,submission_date) values(?,?,?,?)'
+
   var myDate=new Date();
   myDate.toLocaleString();//获取当前时间
   var opparams=[username,email,'login',myDate];
+
   db.query(opsql,opparams,function(qerr,vals,fields){//插入登录操作数据
     if(qerr){
       console.log(qerr);
@@ -30,16 +32,18 @@ exports.login = (req,res)=>{
 
   db.query(sql,username, function(qerr, vals, fields) {
     if(!vals.length){
-      return res.json({status:1,msg:'登陆失败'});
+      return res.json({status:0,msg:'登陆失败'});
     }else{
-      if(vals[0].password==pwd){
+      if(vals[0].password==pwd&&vals[0].status==1){
 
         req.session['username'] = username;//记录session信息！！
         res.cookie('username', username);
 
         return res.json({status:1,msg:'登陆成功'});
+      }else if(vals[0].password==pwd&&vals[0].status==0){
+        return res.json({status:0,msg:'账户未授权登录'})
       }
-      return res.json({status:1,msg:'密码错误'});
+        return res.json({status: 0, msg: '密码错误'});
     }
   });
 }
@@ -53,14 +57,14 @@ exports.register = (req,res)=>{
   let email=req.body.email;
 
   const userInfo = usernameIsExist(username);
-  if(!userInfo){
+  if(userInfo){
     console.log(userInfo);
     return res.json({status:0,msg:'用户名已存在'});
   }
   const emailInfo=useremailIsExist(email)
-  if(!emailInfo){
+  if(emailInfo){
     console.log(emailInfo);
-    return res.json({status:1,msg:'注册邮箱已经使用'});
+    return res.json({status:0,msg:'注册邮箱已经使用'});
   }
 
   var opsql='insert into ophistorys(username,email,operation,submission_date) values(?,?,?,?)';
@@ -69,12 +73,12 @@ exports.register = (req,res)=>{
   var opparams=[username,email,'registe',myDate];
 
   var fetch_sql='insert into users(username,password,email,status) values(?,?,?,?)';
-  var sql_params=[username,password,email,0]
+  var sql_params=[username,password,email,1]//1代表用户已激活，0代表用户未激活！！
 
   db.query(fetch_sql,sql_params,(qerr,vals,fields)=>{
     if(qerr){
       console.log(qerr);
-      return res.json({status:1,msg:'注册失败'});
+      return res.json({status:0,msg:'注册失败'});
     }
     return res.json({status:1,msg:'注册成功'});
   })
@@ -160,10 +164,23 @@ var useremailIsExist=function(email){
  * 查询操作
  */
 exports.search=(req,res)=>{
-
+  let username='user1'
+  var myDate=new Date();
+  myDate.toLocaleString();//获取当前时间
+  var email=''
+  var opparams=[username,email,'search',myDate];
+  let opsql='insert into ophistorys(username,email,operation,submission_date) values(?,?,?,?)'
+  db.query(opsql,opparams,function(qerr,vals,fields){//插入登录操作数据
+    if(qerr){
+      console.log(qerr);
+      return res.json({status:0,msg:'操作记录失败'});
+    }
+  });
+  //插入操作历史激励结束
+  //获得搜索数据
   let key_word=req.body.select_word;
   let words=req.body.search_word;
-
+  //进行elasticsearch搜索
   if(key_word=="key_word"){
     var search={
       index: 'crawler_new',
@@ -215,6 +232,7 @@ exports.admin=(req,res)=>{//获得管理界面初始化数据！
  */
 exports.admin_ban=(req,res)=>{
   let username=req.body.username;
+  console.log(username)
   var fetch_sql='update users set status=? where username=?';
   var params=[0,username]
   db.query(fetch_sql,params,function(query,vals,fields){

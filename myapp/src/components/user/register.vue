@@ -81,6 +81,19 @@ export default{
         , params).then(result=>{
         console.log(result.data)
         this.msg = result.data.msg
+        if(result.data.status == 0) {
+          this.$message({
+            type: 'warning',
+            message: this.msg
+          })
+        }
+        if(result.data.status == 1){
+          this.$message({
+            type: 'warning',
+            message: this.msg
+          })
+          this.$router.push('/login');
+        }
       }).catch(resp =>{
         console.log(resp);
       });

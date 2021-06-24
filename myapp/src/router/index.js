@@ -55,10 +55,16 @@ const router = new Router({
     {
       path:'/admin_home',
       component:Home,
+      meta: {
+        requireAuth: true
+      },
       children:[
         {
         path:'/admin_home/basetable',
         component:Admin,
+          meta: {
+            requireAuth: true
+          }
       }
       ]
     }
