@@ -1,13 +1,15 @@
 const db = require('./db.js');
 const email=require('./emailverify');
+const crypto = require('./crypto');
 
 exports.start = (req,res)=>{
 }
 // 登录注册处理
 exports.login = (req,res)=>{
   let username = req.body.username
-  let pwd = req.body.password
+  let pwd_temp = req.body.password
   var email='';
+  var pwd=crypto.genPassword(pwd_temp)
   //获得当前用户对应的email
   let getemail_sql='select email from users where username=?';
   db.query(getemail_sql,username,(query,vals,fields)=>{
@@ -53,8 +55,9 @@ exports.login = (req,res)=>{
  */
 exports.register = (req,res)=>{
   let username=req.body.username;
-  let password=req.body.password;
+  let password_temp=req.body.password;
   let email=req.body.email;
+  var password=crypto.genPassword(password_temp)
 
   const userInfo = usernameIsExist(username);
   if(userInfo){
